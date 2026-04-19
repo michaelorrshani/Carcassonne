@@ -51,12 +51,12 @@ const TILE_TYPES = {
     ],
     count: 5
   },
-  F: { // City N-S connected, shield
-    edges: 'CFCF',
+  F: { // City E-W connected (bridge), shield
+    edges: 'FCFC',
     features: [
-      { type: 'city', sides: [0, 2], shield: true },
-      { type: 'field', sides: [1] },
-      { type: 'field', sides: [3] }
+      { type: 'city', sides: [1, 3], shield: true },
+      { type: 'field', sides: [0] },
+      { type: 'field', sides: [2] }
     ],
     count: 2
   },
@@ -69,12 +69,12 @@ const TILE_TYPES = {
     ],
     count: 1
   },
-  H: { // Two separate cities N and S
-    edges: 'CFCF',
+  H: { // Two separate cities E and W
+    edges: 'FCFC',
     features: [
-      { type: 'city', sides: [0] },
-      { type: 'city', sides: [2] },
-      { type: 'field', sides: [1, 3] }
+      { type: 'city', sides: [1] },
+      { type: 'city', sides: [3] },
+      { type: 'field', sides: [0, 2] }
     ],
     count: 3
   },
@@ -97,12 +97,12 @@ const TILE_TYPES = {
     ],
     count: 3
   },
-  K: { // City N, road S-W connected (curve)
-    edges: 'CFRR',
+  K: { // City E, road N-W connected (curve)
+    edges: 'RCFR',
     features: [
-      { type: 'city', sides: [0] },
-      { type: 'road', sides: [2, 3] },
-      { type: 'field', sides: [1] },
+      { type: 'city', sides: [1] },
+      { type: 'road', sides: [0, 3] },
+      { type: 'field', sides: [2] },
       { type: 'field', sides: [] }
     ],
     count: 3
