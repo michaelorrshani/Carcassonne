@@ -257,14 +257,95 @@ function drawCityRegion(ctx, feat, S, rand) {
   }
   ctx.restore();
 
-  // Wall outline: draw a thick darker border along the inside of the clipped region
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = C_STONE_DARK;
-  ctx.stroke();
-  ctx.lineWidth = 1;
-  ctx.strokeStyle = C_STONE;
-  ctx.stroke();
+  // Stone wall with battlements along the city perimeter (only the sides facing out)
+  drawCityWalls(ctx, sides, S, rand);
   ctx.restore();
+}
+
+function drawCityWalls(ctx, sides, S, rand) {
+  const depth = 0.36;
+  const wallT = S * 0.055;
+  // For each city side, draw a stone wall strip along that edge
+  ctx.strokeStyle = C_STONE_DARK;
+  ctx.lineWidth = 1;
+  const drawWallStrip = (x, y, w, h) => {
+    // Base stone fill
+    ctx.fillStyle = C_STONE;
+    ctx.fillRect(x, y, w, h);
+    // Shadow
+    ctx.fillStyle = C_STONE_DARK;
+    if (w > h) {
+      ctx.fillRect(x, y + h * 0.55, w, h * 0.45);
+    } else {
+      ctx.fillRect(x + w * 0.55, y, w * 0.45, h);
+    }
+    // Stone block lines
+    ctx.strokeStyle = C_STONE_DARK;
+    ctx.lineWidth = 1;
+    if (w > h) {
+      for (let i = 1; i < 5; i++) {
+        ctx.beginPath();
+        ctx.moveTo(x + (w / 5) * i, y);
+        ctx.lineTo(x + (w / 5) * i, y + h);
+        ctx.stroke();
+      }
+      ctx.beginPath();
+      ctx.moveTo(x, y + h * 0.5);
+      ctx.lineTo(x + w, y + h * 0.5);
+      ctx.stroke();
+    } else {
+      for (let i = 1; i < 5; i++) {
+        ctx.beginPath();
+        ctx.moveTo(x, y + (h / 5) * i);
+        ctx.lineTo(x + w, y + (h / 5) * i);
+        ctx.stroke();
+      }
+      ctx.beginPath();
+      ctx.moveTo(x + w * 0.5, y);
+      ctx.lineTo(x + w * 0.5, y + h);
+      ctx.stroke();
+    }
+    // Outer border
+    ctx.strokeStyle = C_STONE_DARK;
+    ctx.lineWidth = 1.2;
+    ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+  };
+  // Battlements (small teeth on outer edge)
+  const drawBattlements = (side) => {
+    ctx.fillStyle = C_STONE;
+    const teeth = 6;
+    if (side === 0) {
+      for (let i = 0; i < teeth; i++) {
+        if (i % 2 === 0) {
+          ctx.fillRect((i / teeth) * S + 1, -wallT * 0.5, (S / teeth) - 2, wallT * 0.55);
+        }
+      }
+    } else if (side === 1) {
+      for (let i = 0; i < teeth; i++) {
+        if (i % 2 === 0) {
+          ctx.fillRect(S - wallT * 0.05, (i / teeth) * S + 1, wallT * 0.55, (S / teeth) - 2);
+        }
+      }
+    } else if (side === 2) {
+      for (let i = 0; i < teeth; i++) {
+        if (i % 2 === 0) {
+          ctx.fillRect((i / teeth) * S + 1, S - wallT * 0.05, (S / teeth) - 2, wallT * 0.55);
+        }
+      }
+    } else if (side === 3) {
+      for (let i = 0; i < teeth; i++) {
+        if (i % 2 === 0) {
+          ctx.fillRect(-wallT * 0.5, (i / teeth) * S + 1, wallT * 0.55, (S / teeth) - 2);
+        }
+      }
+    }
+  };
+  for (const side of sides) {
+    if (side === 0) drawWallStrip(0, 0, S, wallT);
+    else if (side === 1) drawWallStrip(S - wallT, 0, wallT, S);
+    else if (side === 2) drawWallStrip(0, S - wallT, S, wallT);
+    else if (side === 3) drawWallStrip(0, 0, wallT, S);
+  }
 }
 
 function chooseBuildings(sides, S, rand) {
@@ -366,21 +447,27 @@ function drawRoad(ctx, feat, S, rand) {
     ctx.stroke();
   };
   drawPath(outerWidth, C_ROAD_EDGE);
-  drawPath(innerWidth, C_ROAD);
+  drawPath(innerWidth - S * 0.015, '#c9ae78');
+  drawPath(innerWidth - S * 0.045, C_ROAD);
 
-  // Road dashes (only if road goes roughly in a straight line)
-  if (sides.length === 2) {
-    const dashColor = '#fff';
-    ctx.strokeStyle = dashColor;
-    ctx.lineWidth = 1.2;
-    ctx.setLineDash([4, 5]);
-    ctx.beginPath();
+  // A few small stone speckles along the path
+  ctx.fillStyle = '#8a6e3a';
+  const dotAt = (t) => {
+    if (sides.length === 1) {
+      const [mx, my] = sideMidpoint(sides[0]);
+      return [mx * S * (1 - t) + cx * t, my * S * (1 - t) + cy * t];
+    }
     const [mx1, my1] = sideMidpoint(sides[0]);
     const [mx2, my2] = sideMidpoint(sides[1]);
-    ctx.moveTo(mx1 * S, my1 * S);
-    ctx.quadraticCurveTo(cx, cy, mx2 * S, my2 * S);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    const u = 1 - t, v = t;
+    const x = u * u * mx1 * S + 2 * u * v * cx + v * v * mx2 * S;
+    const y = u * u * my1 * S + 2 * u * v * cy + v * v * my2 * S;
+    return [x, y];
+  };
+  for (let i = 0; i < 4; i++) {
+    const [dx, dy] = dotAt(0.15 + i * 0.23 + (rand() - 0.5) * 0.08);
+    const off = (rand() - 0.5) * S * 0.05;
+    ctx.fillRect(dx + off, dy + off, 2, 2);
   }
 }
 
