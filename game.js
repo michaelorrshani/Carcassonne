@@ -369,6 +369,7 @@ function updateHud() {
 function initApp() {
   state.canvas = document.getElementById('boardCanvas');
   state.ctx = state.canvas.getContext('2d');
+  window.preloadTileImages(() => { /* images ready; re-render if in game */ if (state.phase !== 'menu') render(); });
   window.addEventListener('resize', () => { resizeCanvas(); render(); });
   state.canvas.addEventListener('mousemove', onMouseMove);
   state.canvas.addEventListener('mousedown', onMouseDown);

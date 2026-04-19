@@ -33,13 +33,13 @@ const TILE_TYPES = {
     ],
     count: 1
   },
-  D: { // City N, road E-W, field S
-    edges: 'CRFR',
+  D: { // Road N-S straight, city on E side
+    edges: 'RCRF',
     features: [
-      { type: 'city', sides: [0] },
-      { type: 'road', sides: [1, 3] },
-      { type: 'field', sides: [] },   // interior between city and road
-      { type: 'field', sides: [2] }   // south of road
+      { type: 'road', sides: [0, 2] },
+      { type: 'city', sides: [1] },
+      { type: 'field', sides: [3] },   // west of road (open field)
+      { type: 'field', sides: [] }     // between road and city (interior strip)
     ],
     count: 4
   },
@@ -51,39 +51,39 @@ const TILE_TYPES = {
     ],
     count: 5
   },
-  F: { // City E-W connected, shield
-    edges: 'FCFC',
+  F: { // City N-S connected, shield
+    edges: 'CFCF',
     features: [
-      { type: 'city', sides: [1, 3], shield: true },
-      { type: 'field', sides: [0] },
-      { type: 'field', sides: [2] }
+      { type: 'city', sides: [0, 2], shield: true },
+      { type: 'field', sides: [1] },
+      { type: 'field', sides: [3] }
     ],
     count: 2
   },
-  G: { // City E-W no shield
-    edges: 'FCFC',
+  G: { // City N-S connected, no shield
+    edges: 'CFCF',
     features: [
-      { type: 'city', sides: [1, 3] },
-      { type: 'field', sides: [0] },
-      { type: 'field', sides: [2] }
+      { type: 'city', sides: [0, 2] },
+      { type: 'field', sides: [1] },
+      { type: 'field', sides: [3] }
     ],
     count: 1
   },
-  H: { // Two separate cities E and W, field N-S
-    edges: 'FCFC',
+  H: { // Two separate cities N and S
+    edges: 'CFCF',
     features: [
-      { type: 'city', sides: [1] },
-      { type: 'city', sides: [3] },
-      { type: 'field', sides: [0, 2] }
+      { type: 'city', sides: [0] },
+      { type: 'city', sides: [2] },
+      { type: 'field', sides: [1, 3] }
     ],
     count: 3
   },
-  I: { // Two separate cities S and W (diagonal corners), field N-E
-    edges: 'FFCC',
+  I: { // Two separate cities E and S (corner), field N-W
+    edges: 'FCCF',
     features: [
+      { type: 'city', sides: [1] },
       { type: 'city', sides: [2] },
-      { type: 'city', sides: [3] },
-      { type: 'field', sides: [0, 1] }
+      { type: 'field', sides: [0, 3] }
     ],
     count: 2
   },
@@ -107,14 +107,14 @@ const TILE_TYPES = {
     ],
     count: 3
   },
-  L: { // City N, three separate roads E, S, W (T junction/crossroads)
-    edges: 'CRRR',
+  L: { // City E, three separate roads N, S, W (T-junction to city)
+    edges: 'RCRR',
     features: [
-      { type: 'city', sides: [0] },
-      { type: 'road', sides: [1] },
+      { type: 'city', sides: [1] },
+      { type: 'road', sides: [0] },
       { type: 'road', sides: [2] },
       { type: 'road', sides: [3] },
-      { type: 'field', sides: [] }, // three-way split field
+      { type: 'field', sides: [] },
       { type: 'field', sides: [] },
       { type: 'field', sides: [] }
     ],
