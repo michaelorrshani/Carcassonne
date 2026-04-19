@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>קרקסון</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="menu">
+  <div class="menu-card">
+    <h1>קרקסון</h1>
+    <p class="sub">משחק הנחת אריחים קלאסי. בחר מצב משחק ומספר שחקנים.</p>
+
+    <div class="menu-section">
+      <h3>מצב משחק</h3>
+      <label class="opt">
+        <input type="radio" name="mode" value="classic" checked>
+        <span><b>קלאסי</b></span>
+        <small>ללא שדות - ניקוד לדרכים, ערים ומנזרים בלבד.</small>
+      </label>
+      <label class="opt">
+        <input type="radio" name="mode" value="fields">
+        <span><b>עם שדות</b></span>
+        <small>כולל ניקוד שדות בסוף המשחק (3 נקודות לכל עיר שלמה הגובלת בשדה).</small>
+      </label>
+    </div>
+
+    <div class="menu-section">
+      <h3>מספר שחקנים</h3>
+      <div class="players-row">
+        <label class="opt"><input type="radio" name="players" value="2" checked><span>2</span></label>
+        <label class="opt"><input type="radio" name="players" value="3"><span>3</span></label>
+        <label class="opt"><input type="radio" name="players" value="4"><span>4</span></label>
+        <label class="opt"><input type="radio" name="players" value="5"><span>5</span></label>
+      </div>
+    </div>
+
+    <button class="start-btn">התחל משחק</button>
+
+    <p class="hint" style="margin-top:18px">
+      <b>שליטה:</b> קליק - הנח אריח / חייל · <b>R</b> או רווח - סובב · <b>Shift+גרירה</b> או קליק ימני - הזזת מפה · <b>גלגלת</b> - זום · <b>Esc</b> - דלג על הנחת חייל
+    </p>
+  </div>
+</div>
+
+<div id="game">
+  <div id="boardArea">
+    <canvas id="boardCanvas"></canvas>
+  </div>
+  <div id="sidebar">
+    <div id="hud"></div>
+    <div id="nextTileWrap">
+      <div style="font-size:13px; color:#9aa4b0">האריח הבא:</div>
+      <canvas id="nextTile" width="140" height="140"></canvas>
+      <button id="rotateBtn" class="action">סובב (R)</button>
+      <button id="skipBtn" class="action" style="display:none">דלג על הנחת חייל</button>
+    </div>
+    <div class="hint">
+      <b>איך משחקים:</b><br>
+      1. הנח את האריח על משבצת ריקה שצמודה לאריח קיים - הצדדים חייבים להתאים (דרך-לדרך, עיר-לעיר, שדה-לשדה).<br>
+      2. לאחר הנחה, אפשר להניח חייל על מאפיין שטרם נתפס.<br>
+      3. מאפיינים שהושלמו משיבים את החיילים ומעניקים נקודות.
+    </div>
+    <button id="menuBtn" class="action">חזרה לתפריט</button>
+  </div>
+</div>
+
+<script src="tiles.js"></script>
+<script src="board.js"></script>
+<script src="render.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
