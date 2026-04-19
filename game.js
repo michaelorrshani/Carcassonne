@@ -286,7 +286,7 @@ function render() {
         }
       }
     });
-    window.drawTile(ctx, tile, x * S, y * S, S, { meeples });
+    window.drawTile(ctx, tile, x * S, y * S, S, { meeples, x, y });
   }
 
   // Hover preview
@@ -295,7 +295,7 @@ function render() {
     const tile = window.makeTile(state.currentTileId, state.currentRotation);
     const canPlace = state.board.canPlace(x, y, tile);
     ctx.globalAlpha = canPlace ? 0.8 : 0.4;
-    window.drawTile(ctx, tile, x * S, y * S, S);
+    window.drawTile(ctx, tile, x * S, y * S, S, { x, y });
     ctx.globalAlpha = 1;
     if (!canPlace) {
       ctx.strokeStyle = 'red';
