@@ -13,11 +13,12 @@ function preloadTileImages(onReady) {
   const done = () => {
     if (--remaining === 0) { TILE_IMAGES_READY = true; onReady && onReady(); }
   };
+  const data = window.TILE_IMAGE_DATA || {};
   for (const id of ids) {
     const img = new Image();
     img.onload = done;
     img.onerror = () => { console.error('Failed to load tile', id); done(); };
-    img.src = `assets/tiles/${id}.png`;
+    img.src = data[id] || `assets/tiles/${id}.png`;
     TILE_IMAGES[id] = img;
   }
 }

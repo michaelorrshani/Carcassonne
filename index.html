@@ -2,8 +2,15 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>קרקסון</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#1a1f26">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="קרקסון">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -25,6 +32,11 @@
         <span><b>עם שדות</b></span>
         <small>כולל ניקוד שדות בסוף המשחק (3 נקודות לכל עיר שלמה הגובלת בשדה).</small>
       </label>
+      <label class="opt">
+        <input type="radio" name="mode" value="dragon">
+        <span><b>דרקון</b></span>
+        <small>ללא שדות. חלק מהאריחים מסומנים בדרקון — בהנחת אריח כזה, תזיז את הדרקון 3 משבצות והוא אוכל חיילים בדרכו.</small>
+      </label>
     </div>
 
     <div class="menu-section">
@@ -37,10 +49,33 @@
       </div>
     </div>
 
+    <div class="menu-section">
+      <h3>מספר אריחים בחפיסה</h3>
+      <div class="players-row">
+        <label class="opt"><input type="radio" name="deckSize" value="10"><span>10</span></label>
+        <label class="opt"><input type="radio" name="deckSize" value="20"><span>20</span></label>
+        <label class="opt"><input type="radio" name="deckSize" value="40"><span>40</span></label>
+        <label class="opt"><input type="radio" name="deckSize" value="72" checked><span>72 (מלא)</span></label>
+      </div>
+      <small style="display:block; color:#9aa4b0; margin-top:6px">טיפ: לחיצה על <b>9</b> במהלך המשחק מרוקנת את החפיסה ופותחת מסך סיום.</small>
+    </div>
+
+    <div class="menu-section">
+      <h3>שמות שחקנים (אופציונלי)</h3>
+      <div id="nameInputs" class="name-inputs">
+        <input type="text" data-idx="0" maxlength="14" placeholder="אדום">
+        <input type="text" data-idx="1" maxlength="14" placeholder="כחול">
+        <input type="text" data-idx="2" maxlength="14" placeholder="ירוק">
+        <input type="text" data-idx="3" maxlength="14" placeholder="צהוב">
+        <input type="text" data-idx="4" maxlength="14" placeholder="שחור">
+      </div>
+    </div>
+
     <button class="start-btn">התחל משחק</button>
+    <button id="installBtn" class="action" style="width:100%; margin-top:8px; background:#3a4552">📲 התקן כאפליקציה</button>
 
     <p class="hint" style="margin-top:18px">
-      <b>שליטה:</b> קליק - הנח אריח / חייל · <b>R</b> או רווח - סובב · <b>Shift+גרירה</b> או קליק ימני - הזזת מפה · <b>גלגלת</b> - זום · <b>Esc</b> - דלג על הנחת חייל
+      <b>שליטה:</b> קליק · <b>R</b>/רווח סיבוב (Shift+R הפוך) · <b>חצים</b> הזזה · <b>גלגלת</b> זום · <b>Esc</b> דלג חייל · <b>9</b> סיים חפיסה
     </p>
   </div>
 </div>
@@ -54,8 +89,23 @@
     <div id="nextTileWrap">
       <div style="font-size:13px; color:#9aa4b0">האריח הבא:</div>
       <canvas id="nextTile" width="140" height="140"></canvas>
+      <div id="dragonBadge" style="display:none; color:#ff4444; font-weight:bold; font-size:13px">🐉 אריח דרקון!</div>
+      <div id="peekRow" style="display:none; text-align:center;">
+        <div style="font-size:11px; color:#9aa4b0">ואחריו:</div>
+        <canvas id="peekTile" width="70" height="70"></canvas>
+      </div>
       <button id="rotateBtn" class="action">סובב (R)</button>
       <button id="skipBtn" class="action" style="display:none">דלג על הנחת חייל</button>
+    </div>
+    <div id="deckBarWrap" style="display:none;">
+      <div class="deck-bar-label"><span id="deckBarText">נותרו בערימה: 0</span></div>
+      <div class="deck-bar"><div id="deckBarFill"></div></div>
+    </div>
+    <div id="viewCtrls" style="display:none;">
+      <button id="zoomInBtn" class="action mini" title="זום פנימה">+</button>
+      <button id="zoomOutBtn" class="action mini" title="זום החוצה">−</button>
+      <button id="zoomResetBtn" class="action mini" title="זום 100%">1:1</button>
+      <button id="fitBtn" class="action mini" title="התאמה ללוח">⊡</button>
     </div>
     <div class="hint">
       <b>איך משחקים:</b><br>
@@ -63,13 +113,125 @@
       2. לאחר הנחה, אפשר להניח חייל על מאפיין שטרם נתפס.<br>
       3. מאפיינים שהושלמו משיבים את החיילים ומעניקים נקודות.
     </div>
+    <button id="renameBtn" class="action">✏️ ערוך שמות</button>
+    <button id="endGameBtn" class="action" style="background:#8a3a3a">סיים משחק עכשיו</button>
     <button id="menuBtn" class="action">חזרה לתפריט</button>
   </div>
 </div>
 
+<!-- Extend deck modal -->
+<div id="extendModal" class="modal">
+  <div class="modal-card">
+    <h2>החפיסה נגמרה!</h2>
+    <p>כמה אריחים נוספים לערבב לחפיסה? (0 = סיים משחק)</p>
+    <input type="number" id="extendCount" min="0" max="200" value="0">
+    <div class="modal-btns">
+      <button id="extendConfirm" class="action primary">אישור</button>
+      <button id="extendEnd" class="action">סיים משחק</button>
+    </div>
+  </div>
+</div>
+
+<!-- End game modal -->
+<div id="endModal" class="modal">
+  <div class="modal-card wide">
+    <h2 id="endTitle">סיום משחק</h2>
+    <div id="endScores"></div>
+    <div class="modal-btns">
+      <button id="endNewGame" class="action primary">משחק חדש</button>
+      <button id="endClose" class="action">סגור</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm end game modal -->
+<div id="confirmEndModal" class="modal">
+  <div class="modal-card">
+    <h2>לסיים את המשחק?</h2>
+    <p>הניקוד הסופי יחושב עכשיו (כולל שדות אם במצב מתאים).</p>
+    <div class="modal-btns">
+      <button id="confirmEndYes" class="action primary">כן, סיים</button>
+      <button id="confirmEndNo" class="action">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<!-- Install instructions modal -->
+<div id="installModal" class="modal">
+  <div class="modal-card">
+    <h2>📲 התקנת האפליקציה</h2>
+    <div id="installInstructions" style="font-size:14px; line-height:1.7; color:#c8d0da">
+      <p><b>Chrome / Edge (Android או מחשב):</b><br>בתפריט הדפדפן (⋮) → "התקן אפליקציה" או "הוסף למסך הבית".</p>
+      <p><b>Safari (iPhone / iPad):</b><br>לחץ על כפתור השיתוף (◻️↑) → "הוסף למסך הבית".</p>
+      <p><b>Samsung Internet:</b><br>תפריט (☰) → "הוסף אל" → "מסך הבית".</p>
+      <p><b>Firefox (Android):</b><br>תפריט (⋮) → "התקן".</p>
+      <p style="color:#9aa4b0; font-size:12px; margin-top:12px">הערה: התקנה מלאה דורשת גישה ב־HTTPS או localhost. מ־file:// רק חלק מהדפדפנים יתמכו.</p>
+    </div>
+    <div class="modal-btns">
+      <button id="installClose" class="action primary">הבנתי</button>
+    </div>
+  </div>
+</div>
+
+<!-- Rename players modal -->
+<div id="renameModal" class="modal">
+  <div class="modal-card">
+    <h2>ערוך שמות שחקנים</h2>
+    <div id="renameInputs" class="name-inputs" style="margin-bottom:14px"></div>
+    <div class="modal-btns">
+      <button id="renameConfirm" class="action primary">שמור</button>
+      <button id="renameCancel" class="action">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<script src="tile-images.js"></script>
 <script src="tiles.js"></script>
 <script src="board.js"></script>
 <script src="render.js"></script>
 <script src="game.js"></script>
+<script>
+// PWA: service worker + install prompt
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW registration failed', err));
+  });
+}
+let deferredInstallPrompt = null;
+const installBtn = document.getElementById('installBtn');
+const INSTALL_DISMISSED_KEY = 'carcassonne_install_dismissed';
+async function fireInstallPrompt() {
+  if (!deferredInstallPrompt) return false;
+  deferredInstallPrompt.prompt();
+  const choice = await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  if (choice.outcome === 'dismissed') {
+    try { localStorage.setItem(INSTALL_DISMISSED_KEY, '1'); } catch (_) {}
+  }
+  return true;
+}
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  // Auto-fire the install prompt once, unless the user dismissed it before.
+  let dismissed = false;
+  try { dismissed = localStorage.getItem(INSTALL_DISMISSED_KEY) === '1'; } catch (_) {}
+  if (!dismissed) setTimeout(fireInstallPrompt, 600);
+});
+window.addEventListener('appinstalled', () => {
+  if (installBtn) installBtn.style.display = 'none';
+});
+if (installBtn) {
+  installBtn.addEventListener('click', async () => {
+    // Manual click ignores any previous dismissal
+    try { localStorage.removeItem(INSTALL_DISMISSED_KEY); } catch (_) {}
+    if (!(await fireInstallPrompt())) {
+      document.getElementById('installModal').classList.add('open');
+    }
+  });
+}
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+if (isStandalone && installBtn) installBtn.style.display = 'none';
+</script>
 </body>
 </html>

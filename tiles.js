@@ -51,11 +51,10 @@ const TILE_TYPES = {
     ],
     count: 5
   },
-  F: { // City E-W connected (bridge), shield
-    edges: 'FCFC',
+  F: { // City on N+E+W (3 sides) connected, shield
+    edges: 'CCFC',
     features: [
-      { type: 'city', sides: [1, 3], shield: true },
-      { type: 'field', sides: [0] },
+      { type: 'city', sides: [0, 1, 3], shield: true },
       { type: 'field', sides: [2] }
     ],
     count: 2
