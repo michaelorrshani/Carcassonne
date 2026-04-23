@@ -72,7 +72,7 @@
     </div>
 
     <button class="start-btn">התחל משחק</button>
-    <button id="installBtn" class="action" style="width:100%; margin-top:8px; background:#3a4552">📲 התקן כאפליקציה</button>
+    <button class="action install-action" style="width:100%; margin-top:8px; background:#3a4552">📲 התקן כאפליקציה</button>
 
     <p class="hint" style="margin-top:18px">
       <b>שליטה:</b> קליק · <b>R</b>/רווח סיבוב (Shift+R הפוך) · <b>חצים</b> הזזה · <b>גלגלת</b> זום · <b>Esc</b> דלג חייל · <b>9</b> סיים חפיסה
@@ -114,6 +114,7 @@
       3. מאפיינים שהושלמו משיבים את החיילים ומעניקים נקודות.
     </div>
     <button id="renameBtn" class="action">✏️ ערוך שמות</button>
+    <button class="action install-action" style="background:#3a4552">📲 התקן כאפליקציה</button>
     <button id="endGameBtn" class="action" style="background:#8a3a3a">סיים משחק עכשיו</button>
     <button id="menuBtn" class="action">חזרה לתפריט</button>
   </div>
@@ -198,7 +199,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 let deferredInstallPrompt = null;
-const installBtn = document.getElementById('installBtn');
+const installBtns = document.querySelectorAll('.install-action');
 const INSTALL_DISMISSED_KEY = 'carcassonne_install_dismissed';
 async function fireInstallPrompt() {
   if (!deferredInstallPrompt) return false;
@@ -213,25 +214,23 @@ async function fireInstallPrompt() {
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredInstallPrompt = e;
-  // Auto-fire the install prompt once, unless the user dismissed it before.
   let dismissed = false;
   try { dismissed = localStorage.getItem(INSTALL_DISMISSED_KEY) === '1'; } catch (_) {}
   if (!dismissed) setTimeout(fireInstallPrompt, 600);
 });
 window.addEventListener('appinstalled', () => {
-  if (installBtn) installBtn.style.display = 'none';
+  installBtns.forEach(b => b.style.display = 'none');
 });
-if (installBtn) {
-  installBtn.addEventListener('click', async () => {
-    // Manual click ignores any previous dismissal
+installBtns.forEach(btn => {
+  btn.addEventListener('click', async () => {
     try { localStorage.removeItem(INSTALL_DISMISSED_KEY); } catch (_) {}
     if (!(await fireInstallPrompt())) {
       document.getElementById('installModal').classList.add('open');
     }
   });
-}
+});
 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-if (isStandalone && installBtn) installBtn.style.display = 'none';
+if (isStandalone) installBtns.forEach(b => b.style.display = 'none');
 </script>
 </body>
 </html>
