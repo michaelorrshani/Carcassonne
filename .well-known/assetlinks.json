@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.michaelorrshani.carcassonne",
+        "sha256_cert_fingerprints": ["1A:50:5C:53:8B:93:07:04:5D:BB:B8:7C:84:83:38:F7:6C:23:94:F2:A3:37:E1:9E:EB:9A:00:77:81:41:0B:30"]
+      }
+    }]
