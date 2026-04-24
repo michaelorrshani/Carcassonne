@@ -1,4 +1,4 @@
-const CACHE = 'carcassonne-v3';
+const CACHE = 'carcassonne-v4';
 const SHELL = [
   './',
   './index.html',
@@ -19,6 +19,10 @@ self.addEventListener('install', (e) => {
   );
 });
 
+self.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
+});
+
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) =>
@@ -30,6 +34,21 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
+  const isHtmlNav =
+    req.mode === 'navigate' ||
+    (req.headers.get('accept') || '').includes('text/html');
+  if (isHtmlNav) {
+    // Network-first for page navigations so users always get fresh code.
+    e.respondWith(
+      fetch(req).then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+        return res;
+      }).catch(() => caches.match(req).then((hit) => hit || caches.match('./index.html')))
+    );
+    return;
+  }
+  // Cache-first for static assets (JS/CSS/images).
   e.respondWith(
     caches.match(req).then((hit) => {
       if (hit) return hit;
