@@ -214,9 +214,6 @@ async function fireInstallPrompt() {
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredInstallPrompt = e;
-  let dismissed = false;
-  try { dismissed = localStorage.getItem(INSTALL_DISMISSED_KEY) === '1'; } catch (_) {}
-  if (!dismissed) setTimeout(fireInstallPrompt, 600);
 });
 window.addEventListener('appinstalled', () => {
   installBtns.forEach(b => b.style.display = 'none');

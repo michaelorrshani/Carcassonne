@@ -1,4 +1,4 @@
-const CACHE = 'carcassonne-v2';
+const CACHE = 'carcassonne-v3';
 const SHELL = [
   './',
   './index.html',
