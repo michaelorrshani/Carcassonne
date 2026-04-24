@@ -1,0 +1,7 @@
+# Release artifacts — keep local, don't commit
+releases/signing.keystore
+releases/signing-key-info.txt
+releases/*.apk
+releases/*.aab
+# Junk
+.claude/שס
